@@ -1,2 +1,3 @@
 # ChatBot
-FlowFocus: A web-based health and productivity companion built with HTML and CSS. This chatbot provides guided support to help users balance mental well-being with deep focus and healthy daily habits.
+FlowFocus 🌿
+FlowFocus is a health and focus carebot designed to guide users through wellness and productivity. Built with HTML and CSS, it provides an intuitive interface for mental clarity and habit tracking.
