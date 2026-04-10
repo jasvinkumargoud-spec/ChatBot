@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FocusFlow AI | From Chaos to Control</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Fonts: Orbitron for Sci-Fi feel, Poppins for clean reading -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* --- 1. BRAND IDENTITY SYSTEM --- */
+    :root {
+        --primary: #10b981; /* The Required Neon Green */
+        --primary-dim: rgba(16, 185, 129, 0.2);
+        --primary-glow: 0 0 20px rgba(16, 185, 129, 0.6);
+        --bg-deep: #02040a; /* Deep Void Black */
+        --glass-panel: rgba(10, 20, 30, 0.75);
+        --text-main: #ecfdf5;
+        --text-muted: #64748b;
+        --user-gradient: linear-gradient(135deg, #059669, #10b981);
+        --bot-bg: rgba(16, 185, 129, 0.05);
+        --border-neon: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--bg-deep);
+        color: var(--text-main);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    h1, h2, h3, .brand-text {
+        font-family: 'Orbitron', sans-serif; /* Futuristic Header Font */
+        letter-spacing: 2px;
+    }
+
+    /* --- 2. CINEMATIC INTRO LAYER (CANVAS) --- */
+    #intro-canvas {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 9999;
+        background: #000;
+        transition: opacity 1.5s ease;
+    }
+
+    /* Logo & Tagline Overlay */
+    #brand-overlay {
+        position: fixed;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 10000;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 1s ease;
+    }
+
+    .tagline {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9rem;
+        color: var(--primary);
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        opacity: 0;
+        animation: typeText 1.5s steps(20) forwards;
+    }
+
+    .main-logo {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: white;
+        text-transform: uppercase;
+        text-shadow: 0 0 30px var(--primary);
+        margin: 0;
+        opacity: 0;
+        animation: logoPulse 0.8s ease forwards 1.5s;
+    }
+
+    .highlight { color: var(--primary); }
+
+    /* --- 3. MAIN APP INTERFACE --- */
+    #app-interface {
+        position: relative;
+        width: 100%;
+        max-width: 520px;
+        height: 90vh;
+        background: var(--glass-panel);
+        border-radius: 24px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: var(--border-neon);
+        box-shadow: 0 0 50px rgba(16, 185, 129, 0.15);
+        
+        /* Start Hidden */
+        opacity: 0;
+        transform: scale(0.95) translateY(30px);
+        transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #app-interface.active {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+
+    /* Header */
+    header {
+        background: rgba(0,0,0,0.4);
+        padding: 20px 25px;
+        border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .brand i {
+        color: var(--primary);
+        font-size: 1.4rem;
+        filter: drop-shadow(0 0 8px var(--primary));
+        animation: pulseIcon 3s infinite;
+    }
+
+    .brand-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        background: linear-gradient(90deg, #fff, #a7f3d0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .btn-icon {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: var(--primary);
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .btn-icon:hover {
+        background: var(--primary);
+        color: #000;
+        box-shadow: var(--primary-glow);
+    }
+
+    /* Messages */
+    #messages {
+        flex: 1;
+        padding: 25px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+    #messages::-webkit-scrollbar { width: 5px; }
+    #messages::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+    .msg {
+        max-width: 85%;
+        padding: 14px 20px;
+        border-radius: 18px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        position: relative;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    /* Animation for Inner Messages */
+    .msg.reveal {
+        animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideUpFade {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg.bot {
+        background: var(--bot-bg);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        color: var(--text-main);
+        align-self: flex-start;
+        border-bottom-left-radius: 2px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .msg.user {
+        background: var(--user-gradient);
+        color: #fff;
+        align-self: flex-end;
+        margin-left: auto;
+        border-bottom-right-radius: 2px;
+        box-shadow: 0 5px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Typing Cursor */
+    .cursor {
+        display: inline-block;
+        width: 3px;
+        height: 1.2em;
+        background: var(--primary);
+        margin-left: 2px;
+        vertical-align: middle;
+        animation: blink 1s step-end infinite;
+        box-shadow: 0 0 10px var(--primary);
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Options */
+    #options {
+        padding: 20px;
+        background: rgba(0,0,0,0.3);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .opt-btn {
+        background: transparent;
+        border: 1px solid var(--primary);
+        color: var(--primary);
+        padding: 10px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: 0.3s;
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .opt-btn::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: var(--primary);
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        z-index: -1;
+    }
+
+    .opt-btn:hover {
+        color: #000;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+    }
+    .opt-btn:hover::before { transform: scaleX(1); transform-origin: left; }
+
+    /* Card */
+    .info-card {
+        background: rgba(16, 185, 129, 0.1);
+        border-left: 3px solid var(--primary);
+        color: #d1fae5;
+        padding: 12px;
+        margin-top: 10px;
+        font-size: 0.85rem;
+        border-radius: 0 8px 8px 0;
+    }
+
+    /* Keyframes */
+    @keyframes typeText { from { width: 0; } to { width: 100%; } }
+    @keyframes logoPulse { 
+        0% { opacity: 0; transform: scale(0.8); filter: blur(10px); }
+        50% { transform: scale(1.05); filter: blur(0); }
+        100% { opacity: 1; transform: scale(1); filter: blur(0); }
+    }
+    @keyframes pulseIcon { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.8; text-shadow: 0 0 20px var(--primary); } }
+
+    /* Status Indicator */
+    .status {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.7rem;
+        color: var(--primary);
+        margin-left: 20px;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: none;
+    }
+
+</style>
+</head>
+<body>
+
+<!-- CINEMATIC CANVAS INTRO -->
+<canvas id="intro-canvas"></canvas>
+
+<!-- BRAND OVERLAY (Text) -->
+<div id="brand-overlay">
+    <div class="tagline">From Chaos to Control</div>
+    <h1 class="main-logo">Focus<span class="highlight">Flow</span> AI</h1>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-interface">
+    <header>
+        <div class="brand">
+            <i class="fas fa-brain"></i>
+            <span class="brand-name">FocusFlow AI</span>
+        </div>
+        <button class="btn-icon" id="reset-btn" title="Reset System"><i class="fas fa-power-off"></i></button>
+    </header>
+    
+    <div id="messages">
+        <div class="status" id="sys-status">System Active</div>
+    </div>
+    <div id="options"></div>
+</div>
+
+<script>
+    // --- 1. THE "FROM CHAOS TO CONTROL" PARTICLE ENGINE ---
+    const canvas = document.getElementById('intro-canvas');
+    const ctx = canvas.getContext('2d');
+    const brandOverlay = document.getElementById('brand-overlay');
+    const appInterface = document.getElementById('app-interface');
+    
+    let width, height;
+    let particles = [];
+    let animationId;
+    
+    // Config
+    const particleCount = 120; // Dense enough for network
+    const connectionDistance = 100;
+    const mouseDistance = 150;
+    
+    // State
+    let phase = 'chaos'; // 'chaos' -> 'control'
+    let centerX, centerY;
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        centerX = width / 2;
+        centerY = height / 2;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            // Chaos: High random velocity
+            this.vx = (Math.random() - 0.5) * 4;
+            this.vy = (Math.random() - 0.5) * 4;
+            this.size = Math.random() * 2 + 1;
+            this.color = '#ffffff'; // White initially
+        }
+
+        update() {
+            if (phase === 'chaos') {
+                // Move randomly
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Bounce off walls
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+
+            } else if (phase === 'control') {
+                // Move towards center (Magnetize)
+                const dx = centerX - this.x;
+                const dy = centerY - this.y;
+                
+                this.x += dx * 0.05;
+                this.y += dy * 0.05;
+                
+                // Friction to stop them
+                this.vx *= 0.9;
+                this.vy *= 0.9;
+
+                // Change color to Brand Green
+                this.color = '#10b981';
+            }
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function animate() {
+        // Trail effect for speed sensation
+        ctx.fillStyle = phase === 'chaos' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.2)';
+        ctx.fillRect(0, 0, width, height);
+
+        // Update and Draw Particles
+        particles.forEach((p, index) => {
+            p.update();
+            p.draw();
+
+            // Draw Connections (Neural Network)
+            for (let j = index + 1; j < particles.length; j++) {
+                const p2 = particles[j];
+                const dx = p.x - p2.x;
+                const dy = p.y - p2.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < connectionDistance) {
+                    ctx.beginPath();
+                    // Line color matches particle state
+                    ctx.strokeStyle = phase === 'chaos' 
+                        ? `rgba(255, 255, 255, ${1 - dist/connectionDistance})` 
+                        : `rgba(16, 185, 129, ${1 - dist/connectionDistance})`;
+                    ctx.lineWidth = 1;
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
+            }
+        });
+
+        // Draw Logo Glow in Center (Phase 2 only)
+        if (phase === 'control') {
+            const gradient = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, 150);
+            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.8)');
+            gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 150, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        animationId = requestAnimationFrame(animate);
+    }
+
+    // --- INTRO SEQUENCE LOGIC ---
+    window.onload = () => {
+        initParticles();
+        animate();
+
+        // Phase 1: Chaos (2.5 seconds)
+        setTimeout(() => {
+            phase = 'control'; // Switch to magnetization
+        }, 2500);
+
+        // Phase 2: Reveal Brand Text (0.5s after control starts)
+        setTimeout(() => {
+            brandOverlay.style.opacity = '1';
+        }, 3000);
+
+        // Phase 3: Transition to App (After text animation)
+        setTimeout(() => {
+            // Fade out canvas
+            canvas.style.opacity = '0';
+            brandOverlay.style.opacity = '0'; // Hide text overlay
+            
+            // Show App
+            appInterface.classList.add('active');
+            
+            // Cleanup
+            setTimeout(() => {
+                cancelAnimationFrame(animationId);
+                canvas.style.display = 'none';
+                startChat();
+            }, 1500);
+        }, 5500);
+    };
+
+    // --- 2. CHAT ENGINE (FocusFlow Logic) ---
+    const msgs = document.getElementById('messages');
+    const opts = document.getElementById('options');
+    const status = document.getElementById('sys-status');
+    const resetBtn = document.getElementById('reset-btn');
+
+    function startChat() {
+        typeWriter("System Online.\nI am FocusFlow AI.\nI help you build focus and eliminate chaos.\n\nHow can I assist you today?", null, () => {
+            showOptions(tree);
+        });
+    }
+
+    resetBtn.onclick = () => {
+        msgs.innerHTML = '<div class="status" id="sys-status">System Active</div>';
+        const newStatus = document.getElementById("sys-status");
+        newStatus.style.display = "none";
+        
+        addMsg("Rebooting FocusFlow Systems...", 'user');
+        
+        setTimeout(() => {
+            startChat();
+        }, 1000);
+    };
+
+    function addMsg(text, type) {
+        const d = document.createElement("div");
+        d.className = `msg ${type} reveal`;
+        d.innerText = text;
+        msgs.appendChild(d);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function typeWriter(text, element, callback) {
+        if (!element) {
+            element = document.createElement("div");
+            element.className = "msg bot reveal";
+            msgs.appendChild(element);
+        }
+
+        let i = 0;
+        element.innerHTML = ""; 
+        const cursor = document.createElement("span");
+        cursor.className = "cursor";
+        element.appendChild(cursor);
+
+        function type() {
+            if (i < text.length) {
+                const char = text.charAt(i);
+                const span = document.createElement("span");
+                span.innerHTML = char === '\n' ? '<br>' : char;
+                element.insertBefore(span, cursor);
+                i++;
+                msgs.scrollTop = msgs.scrollHeight;
+                setTimeout(type, 20); 
+            } else {
+                cursor.remove();
+                if (callback) callback();
+            }
+        }
+        type();
+    }
+
+    function showOptions(list) {
+        opts.innerHTML = "";
+        if(!list) return;
+        list.forEach((q, index) => {
+            const b = document.createElement("button");
+            b.className = "opt-btn";
+            b.innerText = q.text;
+            b.onclick = () => handle(q);
+            opts.appendChild(b);
+            // Staggered Reveal
+            b.style.animation = `slideUpFade 0.5s ease forwards ${index * 0.1}s`;
+        });
+    }
+
+    function handle(node) {
+        addMsg(node.text, 'user');
+        opts.innerHTML = ""; 
+
+        status.style.display = "block";
+        msgs.scrollTop = msgs.scrollHeight;
+
+        setTimeout(() => {
+            status.style.display = "none";
+
+            if (node.action === "restart") {
+                typeWriter("Resetting parameters. Select a productivity area.", null, () => showOptions(tree));
+                return;
+            }
+
+            typeWriter(node.answer, null, () => {
+                if (node.example) {
+                    const d = document.createElement("div");
+                    d.className = "info-card";
+                    d.innerHTML = `<b>FOCUS TIP:</b> ${node.example}`;
+                    msgs.appendChild(d);
+                    msgs.scrollTop = msgs.scrollHeight;
+                }
+
+                if (node.next) {
+                    setTimeout(() => showOptions(node.next), 400);
+                } else {
+                    setTimeout(() => showOptions([{text: "Back to main menu", action: "restart"}]), 400);
+                }
+            });
+        }, 600); 
+    }
+
+    /* --- 3. FULL ORIGINAL DATA TREE --- */
+    const tree = [
+        {
+            text:"Morning Routine",
+            answer:"A structured morning routine creates momentum for the rest of the day. It prevents you from starting your day in 'reactive mode'.",
+            next:[
+                {
+                    text:"How to wake up early?",
+                    answer:"The most effective strategy is to remove the option to snooze. Place your alarm clock or phone across the room so you are forced to physically stand up to turn it off.",
+                    example:"Alarm at 6:00 AM on the dresser → Get out of bed → Turn it off → Do not get back in.",
+                    next:[
+                        {text:"I failed today",answer:"One bad morning doesn't ruin the day. Reset immediately. Do 10 pushups or drink water right now to reclaim control.",next:[{text:"Back to main menu",action:"restart"}]},
+                        {text:"I succeeded today",answer:"Great job! That momentum is powerful. Use it to tackle your hardest task first thing tomorrow.",next:[{text:"Back to main menu",action:"restart"}]}
+                    ]
+                },
+                {
+                    text:"Best first 30 minutes?",
+                    answer:"Follow the 'Input before Output' rule. Hydrate, get light, and move before you consume information.",
+                    example:"1. Drink 500ml water. 2. Open blinds/Sunlight. 3. 5 mins stretching. 4. No phone checking until step 4 is done.",
+                    next:[{text:"Back to main menu",action:"restart"}]
+                }
+            ]
+        },
+        {
+            text:"Improve Sleep",
+            answer:"Quality sleep is the foundation of productivity. It is when your brain clears out toxins and consolidates memory.",
+            next:[
+                {
+                    text:"Sleep earlier",
+                    answer:"Create a 'digital sunset'. Blue light from screens tricks your brain into thinking it's daytime, stopping melatonin production.",
+                    example:"Turn off all screens 60 minutes before bed. Use this time to read a physical book or stretch.",
+                    next:[{text:"Back to main menu",action:"restart"}]
+                },
+                {
+                    text:"Fix bad sleep cycle",
+                    answer:"Fix the wake-up time first, not the bedtime. If you wake up at the same time every day, your body will naturally get tired earlier at night.",
+                    example:"Set alarm for 7 AM every single day (including weekends). No naps longer than 20 mins.",
+                    next:[{text:"Back to main menu",action:"restart"}]
+                }
+            ]
+        },
+        {
+            text:"Deep Work & Focus",
+            answer:"Deep work is professional activity performed in a state of distraction-free concentration that pushes your cognitive capabilities to their limit.",
+            next:[
+                {
+                    text:"How to focus longer?",
+                    answer:"Work in time blocks that match your natural energy rhythms (Ultradian Rhythms), typically 90 minutes, followed by a real break.",
+                    example:"90 mins of intense work → 15 mins of walking or stretching (no phone) → Repeat.",
+                    next:[{text:"Back to main menu",action:"restart"}]}
+                ,
+                {
+                    text:"Phone distraction",
+                    answer:"If your phone is within arm's reach, you are not working deeply. You must increase the 'friction' to access it.",
+                    example:"Put phone in a drawer or another room. Use 'Do Not Disturb' mode. Check it only during scheduled breaks.",
+                    next:[{text:"Back to main menu",action:"restart"}]
+                }
+            ]
+        },
+        {
+            text:"Stop Procrastination",
+            answer:"Procrastination is not laziness; it is emotional avoidance. We avoid tasks that make us feel bored, anxious, or insecure.",
+            next:[
+                {
+                    text:"I feel overwhelmed",
+                    answer:"The task feels too big for your brain. Break it down into 'micro-steps' that are so small they are impossible to say no to.",
+                    example:"'Write Essay' is too big. Try: 'Open laptop' → 'Open Word' → 'Write one sentence'.",
+                    next:[{text:"Back to main menu",action:"restart"}]}
+                ,
+                {
+                    text:"I feel lazy",
+                    answer:"Motivation is not the cause of action; it is the result of action. Use the 5-Minute Rule to break the paralysis.",
+                    example:"Tell yourself: 'I will do this task for only 5 minutes. If I want to stop after, I can.' Usually, you won't want to stop.",
+                    next:[{text:"Back to main menu",action:"restart"}]
+                }
+            ]
+        },
+        {
+            text:"Build Any Habit",
+            answer:"Habits are the compound interest of self-improvement. Focus on the system of doing, not the goal of achieving.",
+            next:[
+                {
+                    text:"How to stay consistent?",
+                    answer:"Follow the 'Never Miss Twice' rule. Missing once is an accident; missing twice is the start of a new habit.",
+                    example:"If you miss the gym today, do 10 pushups at home. Do not let the streak die completely.",
+                    next:[{text:"Back to main menu",action:"restart"}]}
+                ,
+                {
+                    text:"I lose consistency",
+                    answer:"Your ambition was likely too high. Scale the habit down to the 'Stupidly Small' level to keep the identity alive.",
+                    example:"Can't meditate for 20 mins? Meditate for 2 mins. Can't run 5k? Put on running shoes and step outside.",
+                    next:[{text:"Back to main menu",action:"restart"}]
+                }
+            ]
+        },
+        {
+            text:"Goal Setting",
+            answer:"You do not rise to the level of your goals; you fall to the level of your systems. Design a daily system that makes success inevitable.",
+            next:[
+                {
+                    text:"How to set clear goals?",
+                    answer:"Separate 'Outcome Goals' from 'Process Goals'. You cannot fully control outcomes, but you can 100% control your process.",
+                    example:"Outcome: 'Get an A'. Process: 'Study Chapter 4 from 7 PM to 9 PM every night'.",
+                    next:[{text:"Back to main menu",action:"restart"}]}
+                ,
+                {
+                    text:"Daily planning method",
+                    answer:"Use the Ivy Lee Method: Write down the 6 most important things for tomorrow. Prioritize them. Start on #1 first thing in the morning.",
+                    example:"List: 1. Report, 2. Email Client, 3. Gym... Work on #1 until finished before moving to #2.",
+                    next:[{text:"Back to main menu",action:"restart"}]
+                }
+            ]
+        },
+        {
+            text:"Time Management",
+            answer:"Time management is really 'Life Management'. The key is not to prioritize what's on your schedule, but to schedule your priorities.",
+            next:[
+                {
+                    text:"How to plan day?",
+                    answer:"Use 'Time Blocking'. Don't work from a to-do list; work from a calendar. Give every task a specific time slot.",
+                    example:"09:00-11:00: Deep Work (Phone away). 11:00-11:30: Email/Comm. 11:30-12:30: Project B.",
+                    next:[{text:"Back to main menu",action:"restart"}]}
+                ,
+                {
+                    text:"I waste time",
+                    answer:"Track your time to find your 'leaks'. You cannot manage what you do not measure. Be honest about where the hours go.",
+                    example:"Use an app like Toggl or a notebook. Log every 30 mins. You might find you waste 2 hours on social media unintentionally.",
+                    next:[{text:"Back to main menu",action:"restart"}]
+                }
+            ]
+        },
+        {
+            text:"Fitness & Health",
+            answer:"Physical fitness is not just about muscles; it's about building the energy and mental clarity needed to succeed in other areas.",
+            next:[
+                {
+                    text:"Quick home workout",
+                    answer:"You don't need a gym. You need intensity. Use HIIT (High Intensity Interval Training) to get maximum benefit in minimum time.",
+                    example:"20 mins: 45 sec work / 15 sec rest. Exercises: Burpees, Pushups, Squats, Lunges. Repeat 4 rounds.",
+                    next:[{text:"Back to main menu",action:"restart"}]}
+                ,
+                {
+                    text:"Improve diet discipline",
+                    answer:"Focus on adding good things rather than just restricting bad things. Crowd out junk food with whole foods.",
+                    example:"Rule 1: Drink water before every meal. Rule 2: Eat protein with every meal. Rule 3: No liquid calories (soda/juice).",
+                    next:[{text:"Back to main menu",action:"restart"}]
+                }
+            ]
+        },
+        {
+            text:"Study System",
+            answer:"Most students study passively (re-reading, highlighting). This creates the 'illusion of competence'. You must study actively.",
+            next:[
+                {
+                    text:"How to remember better?",
+                    answer:"Use 'Active Recall'. After reading a page, close the book and force your brain to retrieve the information without looking.",
+                    example:"Read a section. Look away. Ask: 'What were the 3 main points?'. Write them down. Check answers.",
+                    next:[{text:"Back to main menu",action:"restart"}]}
+                ,
+                {
+                    text:"How to revise?",
+                    answer:"Use 'Spaced Repetition'. Review material at increasing intervals to combat the forgetting curve.",
+                    example:"Review a note after 1 day, then 3 days, then 1 week, then 1 month. This moves info to long-term memory.",
+                    next:[{text:"Back to main menu",action:"restart"}]
+                }
+            ]
+        },
+        {
+            text:"Mindset & Motivation",
+            answer:"Motivation is a feeling, and feelings fade. Discipline is a choice, and choices build character.",
+            next:[
+                {
+                    text:"I feel demotivated",
+                    answer:"Use the 'Do Something' principle. Action isn't just the effect of motivation; it is also the cause of it.",
+                    example:"Don't wait to feel like working. Start working, and the feeling will follow. Just wash one dish to start.",
+                    next:[{text:"Back to main menu",action:"restart"}]}
+                ,
+                {
+                    text:"Fear of failure",
+                    answer:"Reframe failure as 'Data'. It is not a judgment of your worth; it is neutral information showing you what doesn't work.",
+                    example:"Thomas Edison didn't fail 10,000 times; he found 10,000 ways that didn't work. Keep iterating.",
+                    next:[{text:"Back to main menu",action:"restart"}]}
+            ]
+        }
+    ];
+
+</script>
+</body>
+</html>
